@@ -1,0 +1,45 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+celery = "*"
+django-allauth = "*"
+django-auditlog = "*"
+django-environ = "*"
+cssmin = "*"
+django-extra-fields = "*"
+django-filter = "*"
+django-model-utils = "*"
+django-post_office = "*"
+django-redis = "*"
+django-widget-tweaks = "*"
+djangorestframework = "*"
+gunicorn = "*"
+invoke = "*"
+boto = "*"
+WeasyPrint = "*"
+coreapi = "*"
+Pillow = "*"
+psycopg2-binary = "*"
+Django = "*"
+pyinvoke = "*"
+django-pipeline = "*"
+django-celery-results = "*"
+django-weasyprint = "*"
+redis = "==2.10.6"
+django-rest-auth = "*"
+fabric = "*"
+
+[dev-packages]
+coverage = "*"
+django-debug-toolbar = "*"
+bpython = "*"
+factory_boy = "*"
+selenium = "*"
+pyinotify = "*"
+Django = "*"
+
+[requires]
+python_version = "3.7"

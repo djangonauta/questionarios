@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""
+Heroku post compile hook.
+
+Constroe os assets requeridos pela aplicação.
+"""
+
+import os
+
+
+def assets_build():
+    """Build django-assets bundles."""
+    os.system('./manage.py assets build --manifest django')
+
+
+if __name__ == '__main__':
+    assets_build()

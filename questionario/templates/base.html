@@ -1,0 +1,121 @@
+<!doctype html>{% load pipeline static %}
+<html lang="en">
+<head>
+  {% block meta %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  {% endblock meta %}
+
+  <title>{% block title %}Bem vindo{% endblock title %}</title>
+
+  <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
+  <link rel="stylesheet" href="{% static 'bootstrap-vue/dist/bootstrap-vue.min.css' %}">
+
+  {% stylesheet 'base' %}
+
+  {% block styles %}{% endblock styles %}
+</head>
+<body>
+  {% block body %}
+    <div id="app">
+      <b-container fluid>
+        <b-row class="pt-3">
+          <b-col>
+            <legend>Novo Questionário</legend>
+            <b-form>
+              <b-form-group label="Título">
+                <b-form-input name="titulo" v-model='questionario.titulo' size="sm"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Descrição">
+                <b-form-textarea name="descricao" v-model='questionario.descricao' size="sm"></b-form-textarea>
+              </b-form-group>
+              <hr>
+              <h4>Questoes</h4>
+              <b-form-group label="Título">
+                <b-form-input name="titulo" v-model="questao.titulo" size="sm" required></b-form-input>
+              </b-form-group>
+              <b-form-group label="Descrição">
+                <b-form-textarea name="descricao" v-model="questao.descricao"></b-form-textarea>
+              </b-form-group>
+              <b-form-group label="Tipo da Questão">
+                <b-form-select v-model="questao.tipo_questao" :options="questionario_options" size="sm"></b-form-select>
+              </b-form-group>
+
+              <b-form-group label="Alternativas" v-show="questao.tipo_questao !== 1">
+                <b-card>
+                  <b-form-group label="titulo">
+                    <b-form-input size="sm" name="alternativa_titulo" v-model="alternativa.titulo"></b-form-input>
+                  </b-form-group>
+                  <b-form-group label="Descrição">
+                    <b-form-input size="sm" name="alternativa_titulo" v-model="alternativa.descricao"></b-form-input>
+                  </b-form-group>
+                  <hr>
+                  <b-form-group>
+                    <b-button size="sm" class="float-right" @click="adicionarAlternativa">adicionar alternativa</b-button>
+                  </b-form-group>
+                  <hr>
+                  <b-table :fields="alternativasFields" :items="questao.alternativas">
+                    <template slot="index" slot-scope="{ index }">
+                      [[ index + 1 ]]
+                    </template>
+                    <template slot="acao" slot-scope="{ item, index }">
+                      <b-button size="sm" variant="danger" @click="removerAlternativa(index)">remover</b-button>
+                    </template>
+                  </b-table>
+                </b-card>
+              </b-form-group>
+
+              <b-form-group>
+                <b-button @click="adicionarQuestao" size="sm">Adicionar Questão</b-button>
+              </b-form-group>
+              <hr>
+
+              <b-table :fields="questoesFields" :items="questionario.questoes">
+                <template slot="index" slot-scope="{ index }">
+                  [[ index + 1 ]]
+                </template>
+                <template slot="tipo_questao" slot-scope="{ item }">
+                  [[ questionario_options[item.tipo_questao] ]]
+                </template>
+                <template slot="acao" slot-scope="{ item, toggleDetails, index }">
+                  <b-button size="sm" variant="danger" @click="removerQuestao(index)">remover</b-button>
+                  <b-button size="sm" @click="toggleDetails" class="mr-2">alternativas</b-button>
+                </template>
+
+                <template slot="row-details" slot-scope="{ item }">
+                  <h3 v-show="item.alternativas.length === 0">Questao sem alternativas</h3>
+                  <b-card title="alternativas" v-show="item.alternativas.length > 0">
+                    <b-table :fields="alternativasFields" :items="item.alternativas">
+                      <template slot="index" slot-scope="{ index }">
+                        [[ index + 1 ]]
+                      </template>
+                      <template slot="acao" slot-scope="{ item, index }">
+                        <b-button size="sm" variant="danger" @click="removerAlternativa(index)">remover</b-button>
+                      </template>
+                    </b-table>
+                  </b-card>
+                </template>
+              </b-table>
+            </b-form>
+          </b-col>
+
+          <b-col>
+            <legend>Questionários</legend>
+          </b-col>
+        </b-row>
+      </b-container>
+    </div>
+  {% endblock body %}
+
+  {% block scripts %}{% endblock scripts %}
+
+  <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+  <script src="{% static 'axios/dist/axios.min.js' %}"></script>
+  <script src="{% static 'vue/dist/vue.min.js' %}"></script>
+  <script src="{% static 'bootstrap-vue/dist/bootstrap-vue.min.js' %}"></script>
+  <script src="{% static 'lodash/lodash.min.js' %}"></script>
+
+  {% javascript 'app' %}
+</body>
+</html>
