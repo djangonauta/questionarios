@@ -1,0 +1,31 @@
+<b-container>
+  <b-row>
+    <b-col>
+      <router-link to="/cadastrar-questionarios">voltar</router-link>
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col cols="6">
+      <b-form>
+        <b-form-group :label="questionario.titulo" tag="h2">
+          <h3>[[ questionario.descricao ]]</h3>
+        </b-form-group>
+        <b-form-group v-for="questao in questionario.questoes" :label="questao.titulo">
+          <b-form-textarea v-model="questao.resposta" v-if="questao.tipo_questao === 1"></b-form-textarea>
+
+          <b-form-radio v-model="questao.alternativa_selecionada" name="some-radios" :value="alternativa.id"
+            v-for="alternativa in questao.alternativas" v-if="questao.tipo_questao === 2">[[alternativa.titulo]]</b-form-radio>
+
+          <b-form-checkbox-group id="checkbox-group-2" v-model="questao.alternativas_selecionadas" name="flavour-2"
+              v-for="alternativa in questao.alternativas" v-if="questao.tipo_questao === 3">
+            <b-form-checkbox :value="alternativa.id">[[ alternativa.titulo ]]</b-form-checkbox>
+          </b-form-checkbox-group>
+        </b-form-group>
+        <b-form-group>
+          <b-button size="sm" variant="primary" @click="submeterQuestionario">submeter</b-button>
+        </b-form-group>
+      </b-form>
+      <pre>[[ questionario ]]</pre>
+    </b-col>
+  </b-row>
+</b-container>

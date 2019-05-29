@@ -5,7 +5,8 @@ Vue.component('questionarios', resolve => {
       delimiters: ['[[', ']]'],
       data () {
         return {
-          questionario: {questoes: []},
+          questionarios: [],
+          questionario: {inicio: new Date(), questoes: []},
           questao: {tipo_questao: 1, alternativas: []},
           alternativa: {},
           questionario_options: {
@@ -25,10 +26,21 @@ Vue.component('questionarios', resolve => {
             {key: 'titulo', label: 'Título'},
             {key: 'descricao', label: 'Descrição'},
             {key: 'acao', label: 'Ações'},
+          ],
+          questionarioFields: [
+            {key: 'id', label: 'ID'},
+            {key: 'titulo', label: 'Título'},
+            {key: 'descricao', label: 'Descrição'},
+            {key: 'acoes', label: 'Ações'},
           ]
         }
       },
       methods: {
+        carregarQuestionarios () {
+          this.Questionario.query().then(response => {
+            this.questionarios = response.data
+          })
+        },  
         adicionarQuestao () {
           this.questionario.questoes.push(this.questao)
           this.questao = {tipo_questao: 1, alternativas: []}
@@ -42,8 +54,24 @@ Vue.component('questionarios', resolve => {
         },
         removerAlternativa (index) {
           this.questao.alternativas.splice(index, 1)
+        },
+        salvarQuestionario () {
+          this.Questionario.save(this.questionario).then(response => {
+            this.questionario = {inicio: new Date(), questoes: []}
+            this.carregarQuestionarios()
+          })
+        },
+        removerQuestionario (questionario) {
+          if (confirm('remover?')) {
+            this.Questionario.delete(questionario).then(response => {
+              return this.carregarQuestionarios()
+            })
+          }
         }
       },
+      mounted () {
+        this.carregarQuestionarios()
+      }
     })
   })
 })

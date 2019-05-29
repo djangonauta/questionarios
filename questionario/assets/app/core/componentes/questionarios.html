@@ -75,10 +75,20 @@
           </b-card>
         </template>
       </b-table>
+      <hr>
+      <b-button size="sm" @click="salvarQuestionario">salvar questionario</b-button>
     </b-form>
   </b-col>
 
   <b-col>
     <legend>Questionários</legend>
+    <b-table :items='questionarios.results' :fields='questionarioFields'>
+      <template slot="acoes" slot-scope="{ item }">
+        <router-link :to="'/responder/questionario/' + [[ item.id ]]">
+          <b-button size="sm" variant="primary">responder</b-button>
+        </router-link>
+        <b-button size="sm" @click="removerQuestionario(item)" variant="danger">remover</b-button>
+      </template>
+    </b-table>
   </b-col>
 </div>

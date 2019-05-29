@@ -1,5 +1,6 @@
 """Modelo da aplicação questionários."""
 
+from django.conf import settings
 from django.db import models
 from model_utils.models import TimeStampedModel
 
@@ -9,6 +10,13 @@ class Questionario(TimeStampedModel):
 
     titulo = models.CharField(max_length=255)
     descricao = models.TextField()
+    inicio = models.DateTimeField()
+    fim = models.DateTimeField(null=True)
+
+    class Meta:
+        """todo."""
+
+        ordering = ['id']
 
     def __str__(self):
         """toString."""
@@ -29,11 +37,20 @@ class Questao(TimeStampedModel):
     ]
 
     questionario = models.ForeignKey(Questionario, related_name='questoes', on_delete=models.CASCADE)
+    usuarios = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='questoes',
+        through='RespostaQuestao'
+    )
 
     tipo_questao = models.IntegerField(choices=tipoChoices)
     titulo = models.CharField(max_length=255)
-    descricao = models.TextField()
-    resposta = models.TextField()
+    descricao = models.TextField(blank=True)
+
+    class Meta:
+        """todo."""
+
+        ordering = ['id']
 
     def __str__(self):
         """toString."""
@@ -46,10 +63,39 @@ class AlternativaQuestao(TimeStampedModel):
     questao = models.ForeignKey(Questao, related_name='alternativas', on_delete=models.CASCADE)
 
     titulo = models.CharField(max_length=255)
-    descricao = models.TextField()
-    resposta = models.TextField()
-    selecionada = models.BooleanField()
+    descricao = models.TextField(blank=True)
+    resposta = models.TextField(blank=True)
+
+    class Meta:
+        """todo."""
+
+        ordering = ['id']
 
     def __str__(self):
         """toString."""
         return self.titulo
+
+
+class RespostaQuestao(TimeStampedModel):
+    """Resposta de uma determinada questão."""
+
+    questao = models.ForeignKey(Questao, related_name='respostas_questao', on_delete=models.CASCADE)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='respostas_questao',
+        on_delete=models.CASCADE
+    )
+
+    # campos relacionados com a escolha do usuário
+    resposta = models.TextField(blank=True)
+    alternativa_selecionada = models.ForeignKey(
+        'AlternativaQuestao',
+        related_name='resposta_questao_selecionada',
+        on_delete=models.CASCADE,
+        null=True
+    )
+    alternativas_selecionadas = models.ManyToManyField(
+        'AlternativaQuestao',
+        related_name='respostas_questoes_selecionadas',
+        blank=True
+    )

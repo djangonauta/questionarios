@@ -220,11 +220,11 @@
         },
         "django-celery-results": {
             "hashes": [
-                "sha256:0a01b449f2c98d552c837bbcf9127775c1043ac77d9f94d2e44c5afc4556c7f0",
-                "sha256:1c4473de897d4e2ea2aa813771d2424c7d183ea2e9c8aa04c58234113a381e84"
+                "sha256:7c4c6d6d20d6dd7074b07b7a236b5e7769e515379191608527f7fbcc95a669a5",
+                "sha256:f7638b4eaa30ae8c58d3b07196c855c67f341760f434fb64a4c81bf4daf28789"
             ],
             "index": "pypi",
-            "version": "==1.1.0"
+            "version": "==1.1.1"
         },
         "django-environ": {
             "hashes": [
@@ -789,10 +789,10 @@
         },
         "pygments": {
             "hashes": [
-                "sha256:36586500a94cd97f8c2c19d251cdb78868d1a822e0e491bfc1d811766aedb772",
-                "sha256:b437bc0d04dc36f1f5b3592985b3e0a3d0af46b7c39199231706d19a4ee63344"
+                "sha256:71e430bc85c88a430f000ac1d9b331d2407f681d6f6aec95e8bcfbc3df5b0127",
+                "sha256:881c4c157e45f30af185c1ffe8d549d48ac9127433f2c380c24b84572ad66297"
             ],
-            "version": "==2.4.1"
+            "version": "==2.4.2"
         },
         "pyinotify": {
             "hashes": [
