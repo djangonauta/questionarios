@@ -1,8 +1,10 @@
 """Questionarios api."""
 
+from django import shortcuts
 from rest_framework import decorators, permissions, response, serializers, viewsets
 
 from core.pagination import CorePaginator
+from core.serializers import UserSerializer
 
 from . import models
 
@@ -22,7 +24,6 @@ class QuestaoSerializer(serializers.ModelSerializer):
 
     alternativas = AlternativaSerializer(many=True)
     tipo_questao_display = serializers.ReadOnlyField(source='get_tipo_questao_display')
-    respostas = serializers.ReadOnlyField()
 
     class Meta:
         """todo."""
@@ -63,8 +64,24 @@ class QuestionarioViewSet(viewsets.ModelViewSet):
     pagination_class = CorePaginator
 
 
+class QuestaoSerializerList(serializers.ModelSerializer):
+    """todo."""
+
+    alternativas = AlternativaSerializer(many=True)
+    tipo_questao_display = serializers.ReadOnlyField(source='get_tipo_questao_display')
+
+    class Meta:
+        """Meta."""
+
+        model = models.Questao
+        exclude = ['usuarios', 'created', 'modified']
+
+
 class RespostaQuestaoSerializer(serializers.ModelSerializer):
     """Resposta questionário."""
+
+    usuario_data = UserSerializer(source='usuario', read_only=True)
+    questao_data = QuestaoSerializerList(source='questao', read_only=True)
 
     class Meta:
         """Meta opções do serializador."""
@@ -87,14 +104,34 @@ class RespostaQuestaoViewSet(viewsets.ModelViewSet):
     @decorators.action(detail=False, methods=['POST'])
     def submeter(self, request, pk=None):
         """Submeter."""
-        import pprint
-        for questao in request.data.pop('questoes'):
-            questao['questao'] = request.data['id']
-            questao['usuario'] = request.user.id
-            serializer = self.get_serializer(data=questao)
+        respostas = []
+        for questao_dict in request.data.pop('questoes'):
+            data = dict(
+                questao=questao_dict.pop('id'),
+                usuario=request.user.id
+            )
+            serializer = self.get_serializer(data=data)
             if serializer.is_valid():
-                models.RespostaQuestao.objects.create(**serializer.validated_data)
-            else:
-                pprint.pprint(serializer.errors)
+                data['usuario'] = request.user
+                data['questao'] = shortcuts.get_object_or_404(models.Questao, id=data['questao'])
 
-        return response.Response()
+                tipo_questao = questao_dict['tipo_questao']
+                if tipo_questao == models.Questao.TEXTO_LIVRE:
+                    data['resposta'] = questao_dict['resposta']
+
+                elif tipo_questao == models.Questao.UNICA_ESCOLHA:
+                    data['alternativa_selecionada'] = shortcuts.get_object_or_404(
+                        models.AlternativaQuestao,
+                        id=questao_dict['alternativa_selecionada']
+                    )
+
+                resposta = models.RespostaQuestao.objects.create(**data)
+                if tipo_questao == models.Questao.MULTIPLA_ESCOLHA:
+                    resposta.alternativas_selecionadas.set(questao_dict['alternativas_selecionadas'])
+
+                respostas.append(resposta)
+
+            else:
+                return response.Response(serializer.errors)
+
+        return response.Response(self.get_serializer(respostas, many=True).data)
