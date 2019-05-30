@@ -57,11 +57,13 @@ class Questao(TimeStampedModel):
     TEXTO_LIVRE = 1
     UNICA_ESCOLHA = 2
     MULTIPLA_ESCOLHA = 3
+    AVALIACAO = 4
 
-    tipoChoices = [
+    tipo_questao_choices = [
         (TEXTO_LIVRE, 'Texto Livre'),
         (UNICA_ESCOLHA, 'Única Escolha'),
         (MULTIPLA_ESCOLHA, 'Múltipla Escolha'),
+        (AVALIACAO, 'Avaliação'),
     ]
 
     questionario = models.ForeignKey(Questionario, related_name='questoes', on_delete=models.CASCADE)
@@ -71,28 +73,9 @@ class Questao(TimeStampedModel):
         through='RespostaQuestao'
     )
 
-    tipo_questao = models.IntegerField(choices=tipoChoices)
+    tipo_questao = models.IntegerField(choices=tipo_questao_choices)
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True)
-
-    class Meta:
-        """todo."""
-
-        ordering = ['id']
-
-    def __str__(self):
-        """toString."""
-        return self.titulo
-
-
-class AlternativaQuestao(TimeStampedModel):
-    """Alternativa questão."""
-
-    questao = models.ForeignKey(Questao, related_name='alternativas', on_delete=models.CASCADE)
-
-    titulo = models.CharField(max_length=255)
-    descricao = models.TextField(blank=True)
-    resposta = models.TextField(blank=True)
 
     class Meta:
         """todo."""
@@ -132,3 +115,34 @@ class RespostaQuestao(TimeStampedModel):
         """todo."""
 
         unique_together = ['questao', 'usuario']
+
+
+class AlternativaQuestao(TimeStampedModel):
+    """Alternativa questão."""
+
+    PADRAO = 1
+    TEXTO = 2
+    MULTIPLA_ESCOLHA = 3
+
+    tipo_alternativa_choices = [
+        (PADRAO, 'Padrão'),
+        (TEXTO, 'Texto'),
+        (MULTIPLA_ESCOLHA, 'Múltipla Escolha')
+    ]
+
+    questao = models.ForeignKey(Questao, related_name='alternativas', on_delete=models.CASCADE)
+    alternativas = models.ManyToManyField('self', related_name='alternativas', blank=True)
+
+    titulo = models.CharField(max_length=255)
+    descricao = models.TextField(blank=True)
+    tipo_alternativa = models.IntegerField(choices=tipo_alternativa_choices, default=PADRAO)
+    resposta = models.TextField(blank=True)
+
+    class Meta:
+        """todo."""
+
+        ordering = ['id']
+
+    def __str__(self):
+        """toString."""
+        return self.titulo

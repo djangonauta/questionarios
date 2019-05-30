@@ -27,6 +27,11 @@ Vue.component('questionarios', resolve => {
             {key: 'descricao', label: 'Descrição'},
             {key: 'acao', label: 'Ações'},
           ],
+          alternativaOptions: {
+            1: 'Padrão',
+            2: 'Texto',
+            3: 'Múltipla Escolha'
+          },
           questionarioFields: [
             {key: 'id', label: 'ID'},
             {key: 'titulo', label: 'Título'},

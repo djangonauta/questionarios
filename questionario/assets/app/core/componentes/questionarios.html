@@ -28,6 +28,9 @@
           <b-form-group label="Descrição">
             <b-form-input size="sm" name="alternativa_titulo" v-model="alternativa.descricao"></b-form-input>
           </b-form-group>
+          <b-form-group label="Tipo da alternativa">
+            <b-form-select size="sm" v-model="alternativa.tipo_alternativa" :options="alternativaOptions"></b-form-select>
+          </b-form-group>
           <hr>
           <b-form-group>
             <b-button size="sm" class="float-right" @click="adicionarAlternativa">adicionar alternativa</b-button>
