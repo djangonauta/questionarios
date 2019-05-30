@@ -2,6 +2,7 @@
 
 from django import shortcuts
 from rest_framework import decorators, permissions, response, serializers, viewsets
+from django.contrib import auth
 
 from core.pagination import CorePaginator
 from core.serializers import UserSerializer
@@ -53,6 +54,13 @@ class QuestionarioSerializer(serializers.ModelSerializer):
             for alternativa_data in alternativas_data:
                 models.AlternativaQuestao.objects.create(questao=questao, **alternativa_data)
 
+        for usuario in auth.get_user_model().objects.all():
+            models.UsuarioQuestionario.objects.create(
+                questionario=questionario,
+                usuario=usuario,
+                submetido=False,
+            )
+
         return questionario
 
 
@@ -60,8 +68,25 @@ class QuestionarioViewSet(viewsets.ModelViewSet):
     """todo."""
 
     queryset = models.Questionario.objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = QuestionarioSerializer
     pagination_class = CorePaginator
+
+    @decorators.action(detail=False, methods=['GET'])
+    def validos(self, request, pk=None):
+        """Questionários não submetidos."""
+        questionarios = self.get_queryset().filter(
+            usuarios_questionarios__usuario=request.user,
+            usuarios_questionarios__submetido=False,
+        )
+
+        page = self.paginate_queryset(questionarios)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(questionarios, many=True)
+        return response.Response(serializer.data)
 
 
 class QuestaoSerializerList(serializers.ModelSerializer):
@@ -134,4 +159,27 @@ class RespostaQuestaoViewSet(viewsets.ModelViewSet):
             else:
                 return response.Response(serializer.errors)
 
+        questionario = shortcuts.get_object_or_404(models.Questionario, id=request.data['id'])
+        models.UsuarioQuestionario.objects.filter(
+            usuario=request.user,
+            questionario=questionario
+        ).update(submetido=True)
+
         return response.Response(self.get_serializer(respostas, many=True).data)
+
+
+class UsuarioQuestionarioSerializer(serializers.ModelSerializer):
+    """todo."""
+
+    class Meta:
+        """todo."""
+
+        model = models.UsuarioQuestionario
+        fields = '__all__'
+
+
+class UsuarioQuestionarioViewSet(viewsets.ModelViewSet):
+    """todo."""
+
+    queryset = models.UsuarioQuestionario.objects.all()
+    serializer_class = UsuarioQuestionarioSerializer

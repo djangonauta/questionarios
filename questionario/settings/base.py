@@ -57,6 +57,7 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount',
     'auditlog',
     'django_celery_results',
+    'django_extensions',
     'pipeline',
     'post_office',
     'rest_framework',

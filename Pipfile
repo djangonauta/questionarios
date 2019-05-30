@@ -31,6 +31,8 @@ django-weasyprint = "*"
 redis = "==2.10.6"
 django-rest-auth = "*"
 fabric = "*"
+django-extensions = "*"
+pygraphviz = "*"
 
 [dev-packages]
 coverage = "*"

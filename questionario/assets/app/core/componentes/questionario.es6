@@ -18,7 +18,9 @@ Vue.component('questionario', resolve => {
           })
         },
         submeterQuestionario () {
-          this.RespostaQuestao.submeterQuestionario(this.questionario)
+          this.RespostaQuestao.submeterQuestionario(this.questionario).then(() => {
+            this.$router.push('/cadastrar-questionarios')
+          })
         }
       }
     })

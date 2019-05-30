@@ -37,7 +37,7 @@ Vue.component('questionarios', resolve => {
       },
       methods: {
         carregarQuestionarios () {
-          this.Questionario.query().then(response => {
+          this.Questionario.validos().then(response => {
             this.questionarios = response.data
           })
         },  

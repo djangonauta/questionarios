@@ -8,6 +8,13 @@ from model_utils.models import TimeStampedModel
 class Questionario(TimeStampedModel):
     """Questionário."""
 
+    usuarios = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='questionarios',
+        through='UsuarioQuestionario',
+        blank=True,
+    )
+
     titulo = models.CharField(max_length=255)
     descricao = models.TextField()
     inicio = models.DateTimeField()
@@ -21,6 +28,27 @@ class Questionario(TimeStampedModel):
     def __str__(self):
         """toString."""
         return self.titulo
+
+
+class UsuarioQuestionario(TimeStampedModel):
+    """Relaciona usuários com questionários."""
+
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='usuarios_questionarios',
+        on_delete=models.CASCADE,
+    )
+    questionario = models.ForeignKey(
+        Questionario,
+        related_name='usuarios_questionarios',
+        on_delete=models.CASCADE,
+    )
+    submetido = models.BooleanField()
+
+    class Meta:
+        """todo."""
+
+        unique_together = ['usuario', 'questionario']
 
 
 class Questao(TimeStampedModel):
@@ -99,3 +127,8 @@ class RespostaQuestao(TimeStampedModel):
         related_name='respostas_questoes_selecionadas',
         blank=True
     )
+
+    class Meta:
+        """todo."""
+
+        unique_together = ['questao', 'usuario']
