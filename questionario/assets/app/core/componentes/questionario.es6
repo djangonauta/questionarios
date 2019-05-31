@@ -5,7 +5,7 @@ Vue.component('questionario', resolve => {
       delimiters: ['[[', ']]'],
       data () {
         return {
-          questionario: {}
+          questionario: {},
         }
       },
       beforeRouteEnter (to, from, next) {
@@ -15,12 +15,19 @@ Vue.component('questionario', resolve => {
         setQuestionario (id) {
           this.Questionario.get(id).then(response => {
             this.questionario = response.data
+            this.questionario.questoes.forEach(q => {
+              q.questionarioQuestao = {
+                questionario: this.questionario.id,
+                questao: q.id
+              }
+            })
           })
         },
         submeterQuestionario () {
-          this.RespostaQuestao.submeterQuestionario(this.questionario).then(() => {
-            this.$router.push('/cadastrar-questionarios')
-          })
+          console.log(this.questionario.questoes.map(q => q.questionarioQuestao))
+          // this.QuestionariosQuestoes.submeterQuestionario(this.data).then(() => {
+          //   this.$router.push('/cadastrar-questionarios')
+          // })
         }
       }
     })

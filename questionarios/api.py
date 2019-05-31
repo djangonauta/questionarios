@@ -148,35 +148,13 @@ class QuestionariosQuestoesViewSet(viewsets.ModelViewSet):
     @decorators.action(detail=False, methods=['POST'])
     def submeter(self, request, pk=None):
         """Submeter."""
-        respostas = []
-        for questao_dict in request.data.pop('questoes'):
-            data = dict(
-                questao=questao_dict.pop('id'),
-                usuario=request.user.id
-            )
-            serializer = self.get_serializer(data=data)
-            if serializer.is_valid():
-                data['usuario'] = request.user
-                data['questao'] = shortcuts.get_object_or_404(models.Questao, id=data['questao'])
+        serializer = self.get_serializer(data=request.data, many=True)
+        if serializer.is_valid():
+            print(serializer.validated_data)
 
-                tipo_questao = questao_dict['tipo_questao']
-                if tipo_questao == models.Questao.TEXTO_LIVRE:
-                    data['resposta'] = questao_dict['resposta']
-
-                elif tipo_questao == models.Questao.UNICA_ESCOLHA:
-                    data['alternativa_selecionada'] = shortcuts.get_object_or_404(
-                        models.AlternativaQuestao,
-                        id=questao_dict['alternativa_selecionada']
-                    )
-
-                resposta = models.QuestionariosQuestoes.objects.create(**data)
-                if tipo_questao == models.Questao.MULTIPLA_ESCOLHA:
-                    resposta.alternativas_selecionadas.set(questao_dict['alternativas_selecionadas'])
-
-                respostas.append(resposta)
-
-            else:
-                return response.Response(serializer.errors)
+        else:
+            print(serializer.errors)
+            return response.Response('erro')
 
         questionario = shortcuts.get_object_or_404(models.Questionario, id=request.data['id'])
         models.UsuariosQuestionarios.objects.filter(
@@ -184,7 +162,7 @@ class QuestionariosQuestoesViewSet(viewsets.ModelViewSet):
             questionario=questionario
         ).update(submetido=True)
 
-        return response.Response(self.get_serializer(respostas, many=True).data)
+        return response.Response('ok')
 
 
 class UsuariosQuestionariosSerializer(serializers.ModelSerializer):

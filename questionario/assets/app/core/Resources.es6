@@ -19,12 +19,12 @@ window.Questionario = {
   }
 }
 
-window.RespostaQuestao = {
+window.QuestionariosQuestoes = {
   install(Vue, options) {
-    const url = '/api/v1/respostas/'
-    Vue.prototype.RespostaQuestao = Vue.prototype.Resource(url, {
-      submeterQuestionario (questionario) {
-        return axios.post(`${url}submeter/`, questionario)
+    const url = '/api/v1/questionarios-questoes/'
+    Vue.prototype.QuestionariosQuestoes = Vue.prototype.Resource(url, {
+      submeterQuestionario (data) {
+        return axios.post(`${url}submeter/`, data)
       }
     })
   }
