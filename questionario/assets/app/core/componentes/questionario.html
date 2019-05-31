@@ -16,9 +16,18 @@
           <b-form-radio v-model="questao.alternativa_selecionada" name="some-radios" :value="alternativa.id"
             v-for="alternativa in questao.alternativas" v-if="questao.tipo_questao === 2">[[alternativa.titulo]]</b-form-radio>
 
-          <b-form-checkbox-group id="checkbox-group-2" v-model="questao.alternativas_selecionadas" name="flavour-2"
+          <b-form-checkbox-group v-model="questao.alternativas_selecionadas" name="flavour-2"
               v-for="alternativa in questao.alternativas" v-if="questao.tipo_questao === 3">
             <b-form-checkbox :value="alternativa.id">[[ alternativa.titulo ]]</b-form-checkbox>
+          </b-form-checkbox-group>
+
+          <b-form-checkbox-group v-model="questao.alternativas_selecionadas" name="flavour-2"
+              v-for="alternativa in questao.alternativas" v-if="questao.tipo_questao === 4">
+            <span>[[ alternativa.titulo ]]</span>
+            <b-form-radio-group v-model="alternativa.alternativa_selecionada" name="radios" style="display: inline-block">
+              <b-form-radio :value="alt.id"
+                v-for="alt in alternativa.alternativas">[[ alt.titulo ]]</b-form-radio>
+            </b-form-radio-group>
           </b-form-checkbox-group>
         </b-form-group>
         <b-form-group>

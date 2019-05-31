@@ -1,8 +1,8 @@
 """Questionarios api."""
 
 from django import shortcuts
-from rest_framework import decorators, permissions, response, serializers, viewsets
 from django.contrib import auth
+from rest_framework import decorators, permissions, response, serializers, viewsets
 
 from core.pagination import CorePaginator
 from core.serializers import UserSerializer
@@ -10,8 +10,20 @@ from core.serializers import UserSerializer
 from . import models
 
 
+class SubAlternativaSerializer(serializers.ModelSerializer):
+    """todo."""
+
+    class Meta:
+        """todo."""
+
+        model = models.AlternativaQuestao
+        exclude = ['questao']
+
+
 class AlternativaSerializer(serializers.ModelSerializer):
     """todo."""
+
+    alternativas = SubAlternativaSerializer(required=False, many=True)
 
     class Meta:
         """todo."""
@@ -46,13 +58,20 @@ class QuestionarioSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """todo."""
-        questoes_data = validated_data.pop('questoes')
+        questoes_list_dict = validated_data.pop('questoes')
         questionario = models.Questionario.objects.create(**validated_data)
-        for questao_data in questoes_data:
-            alternativas_data = questao_data.pop('alternativas')
-            questao = models.Questao.objects.create(questionario=questionario, **questao_data)
-            for alternativa_data in alternativas_data:
-                models.AlternativaQuestao.objects.create(questao=questao, **alternativa_data)
+        for questao_dict in questoes_list_dict:
+            alternativas_list_dict = questao_dict.pop('alternativas', [])
+            questao = models.Questao.objects.create(questionario=questionario, **questao_dict)
+            for alternativa_dict in alternativas_list_dict:
+                sub_alternativa_list_dict = alternativa_dict.pop('alternativas', [])
+                alternativa = models.AlternativaQuestao.objects.create(questao=questao, **alternativa_dict)
+                for sub_alternativa_dict in sub_alternativa_list_dict:
+                    sub_alternativa_dict.pop('alternativas', [])
+                    models.AlternativaQuestao.objects.create(
+                        alternativa=alternativa,
+                        **sub_alternativa_dict
+                    )
 
         for usuario in auth.get_user_model().objects.all():
             models.UsuarioQuestionario.objects.create(

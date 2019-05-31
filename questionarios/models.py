@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.db import models
 from model_utils.models import TimeStampedModel
+from rest_framework import exceptions
 
 
 class Questionario(TimeStampedModel):
@@ -70,7 +71,7 @@ class Questao(TimeStampedModel):
     usuarios = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='questoes',
-        through='RespostaQuestao'
+        through='RespostaQuestao',
     )
 
     tipo_questao = models.IntegerField(choices=tipo_questao_choices)
@@ -130,8 +131,8 @@ class AlternativaQuestao(TimeStampedModel):
         (MULTIPLA_ESCOLHA, 'Múltipla Escolha')
     ]
 
-    questao = models.ForeignKey(Questao, related_name='alternativas', on_delete=models.CASCADE)
-    alternativas = models.ManyToManyField('self', related_name='alternativas', blank=True)
+    questao = models.ForeignKey(Questao, related_name='alternativas', on_delete=models.CASCADE, null=True)
+    alternativa = models.ForeignKey('self', related_name='alternativas',  on_delete=models.CASCADE, null=True)
 
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True)
@@ -142,6 +143,11 @@ class AlternativaQuestao(TimeStampedModel):
         """todo."""
 
         ordering = ['id']
+
+    def clean(self):
+        """Validação do modelo."""
+        if self.questao is None and self.alternativa is None:
+            raise exceptions.ValidationError('Questão, ou Alternativa, precisam ser definidos')
 
     def __str__(self):
         """toString."""
