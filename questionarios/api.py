@@ -74,7 +74,7 @@ class QuestionarioSerializer(serializers.ModelSerializer):
                     )
 
         for usuario in auth.get_user_model().objects.all():
-            models.UsuarioQuestionario.objects.create(
+            models.UsuariosQuestionarios.objects.create(
                 questionario=questionario,
                 usuario=usuario,
                 submetido=False,
@@ -121,7 +121,7 @@ class QuestaoSerializerList(serializers.ModelSerializer):
         exclude = ['usuarios', 'created', 'modified']
 
 
-class RespostaQuestaoSerializer(serializers.ModelSerializer):
+class QuestionariosQuestoesSerializer(serializers.ModelSerializer):
     """Resposta questionário."""
 
     usuario_data = UserSerializer(source='usuario', read_only=True)
@@ -130,16 +130,16 @@ class RespostaQuestaoSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta opções do serializador."""
 
-        model = models.RespostaQuestao
+        model = models.QuestionariosQuestoes
         fields = '__all__'
 
 
-class RespostaQuestaoViewSet(viewsets.ModelViewSet):
+class QuestionariosQuestoesViewSet(viewsets.ModelViewSet):
     """todo."""
 
-    queryset = models.RespostaQuestao.objects.all()
+    queryset = models.QuestionariosQuestoes.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = RespostaQuestaoSerializer
+    serializer_class = QuestionariosQuestoesSerializer
 
     def perform_create(self, serializer):
         """Create."""
@@ -169,7 +169,7 @@ class RespostaQuestaoViewSet(viewsets.ModelViewSet):
                         id=questao_dict['alternativa_selecionada']
                     )
 
-                resposta = models.RespostaQuestao.objects.create(**data)
+                resposta = models.QuestionariosQuestoes.objects.create(**data)
                 if tipo_questao == models.Questao.MULTIPLA_ESCOLHA:
                     resposta.alternativas_selecionadas.set(questao_dict['alternativas_selecionadas'])
 
@@ -179,7 +179,7 @@ class RespostaQuestaoViewSet(viewsets.ModelViewSet):
                 return response.Response(serializer.errors)
 
         questionario = shortcuts.get_object_or_404(models.Questionario, id=request.data['id'])
-        models.UsuarioQuestionario.objects.filter(
+        models.UsuariosQuestionarios.objects.filter(
             usuario=request.user,
             questionario=questionario
         ).update(submetido=True)
@@ -187,18 +187,18 @@ class RespostaQuestaoViewSet(viewsets.ModelViewSet):
         return response.Response(self.get_serializer(respostas, many=True).data)
 
 
-class UsuarioQuestionarioSerializer(serializers.ModelSerializer):
+class UsuariosQuestionariosSerializer(serializers.ModelSerializer):
     """todo."""
 
     class Meta:
         """todo."""
 
-        model = models.UsuarioQuestionario
+        model = models.UsuariosQuestionarios
         fields = '__all__'
 
 
-class UsuarioQuestionarioViewSet(viewsets.ModelViewSet):
+class UsuariosQuestionariosViewSet(viewsets.ModelViewSet):
     """todo."""
 
-    queryset = models.UsuarioQuestionario.objects.all()
-    serializer_class = UsuarioQuestionarioSerializer
+    queryset = models.UsuariosQuestionarios.objects.all()
+    serializer_class = UsuariosQuestionariosSerializer

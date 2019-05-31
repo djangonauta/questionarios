@@ -52,7 +52,7 @@ Vue.component('questionarios', resolve => {
         },  
         adicionarQuestao () {
           this.questionario.questoes.push(this.questao)
-          this.questao = {tipo_questao: 1, alternativas: []}
+          this.questao = {tipo_questao: '1', alternativas: []}
         },
         removerQuestao (index) {
           this.questionario.questoes.splice(index, 1)
