@@ -127,13 +127,13 @@ class QuestionariosQuestoes(TimeStampedModel):
 class AlternativaQuestao(TimeStampedModel):
     """Alternativa questão."""
 
-    PADRAO = 1
-    TEXTO = 2
+    TEXTO_LIVRE = 1
+    UNICA_ESCOLHA = 2
     MULTIPLA_ESCOLHA = 3
 
     tipo_alternativa_choices = [
-        (PADRAO, 'Padrão'),
-        (TEXTO, 'Texto'),
+        (TEXTO_LIVRE, 'Texto'),
+        (UNICA_ESCOLHA, 'Única Escolha'),
         (MULTIPLA_ESCOLHA, 'Múltipla Escolha')
     ]
 
@@ -142,8 +142,20 @@ class AlternativaQuestao(TimeStampedModel):
 
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True)
-    tipo_alternativa = models.IntegerField(choices=tipo_alternativa_choices, default=PADRAO)
+    tipo_alternativa = models.IntegerField(choices=tipo_alternativa_choices, default=UNICA_ESCOLHA)
+
     resposta = models.TextField(blank=True)
+    alternativa_selecionada = models.ForeignKey(
+        'AlternativaQuestao',
+        related_name='alternativa_questao_alternativa_selecionada',
+        on_delete=models.CASCADE,
+        null=True
+    )
+    alternativas_selecionadas = models.ManyToManyField(
+        'AlternativaQuestao',
+        related_name='alternativa_questao_alternativas_selecionadas',
+        blank=True
+    )
 
     class Meta:
         """todo."""

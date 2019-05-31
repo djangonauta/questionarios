@@ -38,9 +38,9 @@ Vue.component('questionarios', resolve => {
             {key: 'acao', label: 'Ações'},
           ],
           alternativaOptions: {
-            1: 'Padrão',
-            2: 'Texto',
-            3: 'Múltipla Escolha'
+            1: 'Texto Livre',
+            2: 'Única Escolha',
+            3: 'Múltipla Escolha',
           },
         }
       },
