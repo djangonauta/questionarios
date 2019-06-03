@@ -28,67 +28,90 @@ class QuestionarioTest(test.TestCase):
     def test_questionario(self):
         """todo."""
         questionario = models.Questionario.objects.create(
-            titulo='Questionario 1',
-            descricao='descricao questionario 1',
-            inicio=datetime.datetime(2019, 10, 10)
+            titulo='Questionário 1',
+            descricao='',
+            inicio=datetime.datetime.now(),
         )
 
-        q1 = models.Questao.objects.create(
-            titulo='Primeira questão',
-            tipo_questao=models.Questao.MULTIPLA_ESCOLHA,
+        questao_1 = models.Questao.objects.create(
             questionario=questionario,
+            titulo='Escolha uma das opções a seguir',
+            tipo_questao=models.Questao.UNICA_ESCOLHA,
+        )
+        alternativa_sim = models.AlternativaQuestao.objects.create(
+            questao=questao_1,
+            titulo='sim',
+        )
+        alternativa_nao = models.AlternativaQuestao.objects.create(  # noqa
+            questao=questao_1,
+            titulo='não',
         )
 
-        a = models.AlternativaQuestao.objects.create(
-            titulo='A',
-            questao=q1
+        questao_2 = models.Questao.objects.create(
+            questionario=questionario,
+            titulo='Escolha quantas opções forem necessárias',
+            tipo_questao=models.Questao.MULTIPLA_ESCOLHA,
+        )
+        alternativa_a = models.AlternativaQuestao.objects.create(
+            questao=questao_2,
+            titulo='A'
+        )
+        alternativa_b = models.AlternativaQuestao.objects.create(
+            questao=questao_2,
+            titulo='B'
+        )
+        alternativa_c = models.AlternativaQuestao.objects.create(  # noqa
+            questao=questao_2,
+            titulo='C'
+        )
+        alternativa_d = models.AlternativaQuestao.objects.create(
+            questao=questao_2,
+            titulo='D'
+        )
+        alternativa_e = models.AlternativaQuestao.objects.create(  # noqa
+            questao=questao_2,
+            titulo='E'
         )
 
-        b = models.AlternativaQuestao.objects.create(
-            titulo='B',
-            questao=q1
+        questao_3 = models.Questao.objects.create(  # noqa
+            questionario=questionario,
+            titulo='Responda a questão a seguir',
+            tipo_questao=models.Questao.TEXTO_LIVRE,
         )
 
-        c = models.AlternativaQuestao.objects.create(
-            titulo='C',
-            questao=q1
+        resposta_questao_1 = models.QuestionariosQuestoes.objects.create(  # noqa
+            questionario=questionario,
+            usuario=self.usuarios[0],
+            questao=questao_1,
+            alternativa_selecionada=alternativa_sim,
         )
 
-        self.assertEqual(models.Questionario.objects.count(), 1)
-        self.assertEqual(models.Questao.objects.count(), 1)
-        self.assertEqual(models.AlternativaQuestao.objects.count(), 3)
+        resposta_questao_2 = models.QuestionariosQuestoes.objects.create(
+            questionario=questionario,
+            usuario=self.usuarios[0],
+            questao=questao_2,
+        )
+        resposta_questao_2.alternativas_selecionadas.set([
+            alternativa_a,
+            alternativa_b,
+            alternativa_d
+        ])
 
-        models.RespostaQuestao.objects.create(
-            questao=q1,
-            alternativa=b,
-            usuario=self.usuarios[0]
+        resposta_questao_3 = models.QuestionariosQuestoes.objects.create(  # noqa
+            questionario=questionario,
+            usuario=self.usuarios[0],
+            questao=questao_3,
+            resposta='Resposta da questão 3',
         )
 
-        models.RespostaQuestao.objects.create(
-            questao=q1,
-            alternativa=a,
-            usuario=self.usuarios[1]
+        models.UsuariosQuestionarios.objects.create(
+            questionario=questionario,
+            usuario=self.usuarios[0],
+            submetido=True,
         )
-
-        models.RespostaQuestao.objects.create(
-            questao=q1,
-            alternativa=c,
-            usuario=self.usuarios[2]
+        respostas = models.QuestionariosQuestoes.objects.filter(
+            questionario=questionario,
+            usuario=self.usuarios[0],
         )
-
-        models.RespostaQuestao.objects.create(
-            questao=q1,
-            alternativa=c,
-            usuario=self.usuarios[3]
-        )
-
-        models.RespostaQuestao.objects.create(
-            questao=q1,
-            alternativa=a,
-            usuario=self.usuarios[4]
-        )
-
-        self.assertEqual(
-            models.RespostaQuestao.objects.filter(usuario=self.usuarios[3], questao=q1)[0].alternativa.titulo,
-            'C'
-        )
+        for resposta in respostas:
+            print(resposta, end='\n\n')

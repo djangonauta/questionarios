@@ -123,6 +123,25 @@ class QuestionariosQuestoes(TimeStampedModel):
 
         unique_together = ['questionario', 'questao', 'usuario']
 
+    def alternativas_selecionadas_texto(self):
+        """Retorna uma representação textual das alternativas selecionadas."""
+        return ', '.join(map(str, self.alternativas_selecionadas.all()))
+
+    def __str__(self):
+        """toString."""
+        resposta = f'Resposta do usuário "{self.usuario.username}" referente a questão '
+        resposta += f'"{self.questao.titulo}" do questionário "{self.questionario.titulo}": '
+        if self.questao.tipo_questao == Questao.TEXTO_LIVRE:
+            resposta += f'{self.resposta}'
+
+        elif self.questao.tipo_questao == Questao.UNICA_ESCOLHA:
+            resposta += f'Alternativa: {self.alternativa_selecionada.titulo}'
+
+        elif self.questao.tipo_questao == Questao.MULTIPLA_ESCOLHA:
+            resposta += f'Alternativas: {self.alternativas_selecionadas_texto()}'
+
+        return resposta
+
 
 class AlternativaQuestao(TimeStampedModel):
     """Alternativa questão."""
