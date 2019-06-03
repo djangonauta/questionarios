@@ -24,10 +24,10 @@ Vue.component('questionario', resolve => {
           })
         },
         submeterQuestionario () {
-          console.log(this.questionario.questoes.map(q => q.questionarioQuestao))
-          // this.QuestionariosQuestoes.submeterQuestionario(this.data).then(() => {
-          //   this.$router.push('/cadastrar-questionarios')
-          // })
+          const data = this.questionario.questoes.map(q => q.questionarioQuestao)
+          this.QuestionariosQuestoes.submeterQuestionario(data).then(() => {
+            this.$router.push('/cadastrar-questionarios')
+          })
         }
       }
     })

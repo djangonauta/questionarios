@@ -118,7 +118,7 @@ class QuestaoSerializerList(serializers.ModelSerializer):
         """Meta."""
 
         model = models.Questao
-        exclude = ['usuarios', 'created', 'modified']
+        exclude = ['created', 'modified']
 
 
 class QuestionariosQuestoesSerializer(serializers.ModelSerializer):
@@ -148,21 +148,29 @@ class QuestionariosQuestoesViewSet(viewsets.ModelViewSet):
     @decorators.action(detail=False, methods=['POST'])
     def submeter(self, request, pk=None):
         """Submeter."""
+        for q in request.data:
+            q['usuario'] = request.user.id
+
         serializer = self.get_serializer(data=request.data, many=True)
         if serializer.is_valid():
-            print(serializer.validated_data)
+            import pprint
+            pprint.pprint(serializer.validated_data)
+            for questionario_questao_dict in serializer.validated_data:
+                alternativas_selecionadas = questionario_questao_dict.pop('alternativas_selecionadas', [])
+                questionario = models.QuestionariosQuestoes.objects.create(**questionario_questao_dict)
+                if alternativas_selecionadas:
+                    questionario.alternativas_selecionadas.set(alternativas_selecionadas)
+
+            models.UsuariosQuestionarios.objects.filter(
+                usuario=request.user,
+                questionario=serializer.validated_data[0]['questionario']
+            ).update(submetido=True)
+
+            return response.Response('ok')
 
         else:
             print(serializer.errors)
             return response.Response('erro')
-
-        questionario = shortcuts.get_object_or_404(models.Questionario, id=request.data['id'])
-        models.UsuariosQuestionarios.objects.filter(
-            usuario=request.user,
-            questionario=questionario
-        ).update(submetido=True)
-
-        return response.Response('ok')
 
 
 class UsuariosQuestionariosSerializer(serializers.ModelSerializer):
