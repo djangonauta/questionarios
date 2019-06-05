@@ -17,8 +17,8 @@
             v-for="alternativa in questao.alternativas" v-if="questao.tipo_questao === 2">[[alternativa.titulo]]</b-form-radio>
 
           <b-form-checkbox-group v-model="questao.questionarioQuestao.alternativas_selecionadas" name="flavour-2"
-              v-for="alternativa in questao.alternativas" v-if="questao.tipo_questao === 3">
-            <b-form-checkbox :value="alternativa.id">[[ alternativa.titulo ]]</b-form-checkbox>
+              v-if="questao.tipo_questao === 3">
+            <b-form-checkbox v-for="alternativa in questao.alternativas" :value="alternativa.id">[[ alternativa.titulo ]]</b-form-checkbox>
           </b-form-checkbox-group>
 
           <b-form-checkbox-group v-model="questao.questionarioQuestao.alternativas_selecionadas" name="flavour-2"

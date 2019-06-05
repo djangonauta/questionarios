@@ -18,7 +18,8 @@ Vue.component('questionario', resolve => {
             this.questionario.questoes.forEach(q => {
               q.questionarioQuestao = {
                 questionario: this.questionario.id,
-                questao: q.id
+                questao: q.id,
+                alternativas_selecionadas: []
               }
             })
           })

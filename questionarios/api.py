@@ -161,11 +161,6 @@ class QuestionariosQuestoesViewSet(viewsets.ModelViewSet):
                 if alternativas_selecionadas:
                     questionario.alternativas_selecionadas.set(alternativas_selecionadas)
 
-            models.UsuariosQuestionarios.objects.filter(
-                usuario=request.user,
-                questionario=serializer.validated_data[0]['questionario']
-            ).update(submetido=True)
-
             return response.Response('ok')
 
         else:

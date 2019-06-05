@@ -56,7 +56,7 @@ class QuestionarioTest(test.TestCase):
             questao=questao_2,
             titulo='A'
         )
-        alternativa_b = models.AlternativaQuestao.objects.create(
+        alternativa_b = models.AlternativaQuestao.objects.create(  # noqa
             questao=questao_2,
             titulo='B'
         )
@@ -68,7 +68,7 @@ class QuestionarioTest(test.TestCase):
             questao=questao_2,
             titulo='D'
         )
-        alternativa_e = models.AlternativaQuestao.objects.create(  # noqa
+        alternativa_e = models.AlternativaQuestao.objects.create(
             questao=questao_2,
             titulo='E'
         )
@@ -77,6 +77,62 @@ class QuestionarioTest(test.TestCase):
             questionario=questionario,
             titulo='Responda a questão a seguir',
             tipo_questao=models.Questao.TEXTO_LIVRE,
+        )
+
+        questao_4 = models.Questao.objects.create(
+            questionario=questionario,
+            titulo='Avalie os items a seguir',
+            tipo_questao=models.Questao.AVALIACAO,
+        )
+
+        item_1 = models.ItemQuestao.objects.create(
+            questao=questao_4,
+            titulo='Acredito que...'
+        )
+
+        item_1_alternativa_item_1 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_1,
+            titulo='1 - Discordo Totalmente'
+        )
+
+        item_1_alternativa_item_2 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_1,
+            titulo='2 - Discordo Parcialmente'
+        )
+
+        item_1_alternativa_item_3 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_1,
+            titulo='3 - Concordo Parcialmente'
+        )
+
+        item_1_alternativa_item_2 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_1,
+            titulo='4 - Concordo Totalmente'
+        )
+
+        item_2 = models.ItemQuestao.objects.create(
+            questao=questao_4,
+            titulo='Penso que...'
+        )
+
+        item_2_alternativa_item_2 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_2,
+            titulo='1 - Discordo Totalmente'
+        )
+
+        item_2_alternativa_item_2 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_2,
+            titulo='2 - Discordo Parcialmente'
+        )
+
+        item_2_alternativa_item_3 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_2,
+            titulo='3 - Concordo Parcialmente'
+        )
+
+        item_2_alternativa_item_4 = models.AlternativaItemQuestao.objects.create(
+            item_questao=item_2,
+            titulo='4 - Concordo Totalmente'
         )
 
         resposta_questao_1 = models.QuestionariosQuestoes.objects.create(  # noqa
@@ -93,8 +149,8 @@ class QuestionarioTest(test.TestCase):
         )
         resposta_questao_2.alternativas_selecionadas.set([
             alternativa_a,
-            alternativa_b,
-            alternativa_d
+            alternativa_d,
+            alternativa_e,
         ])
 
         resposta_questao_3 = models.QuestionariosQuestoes.objects.create(  # noqa
@@ -102,6 +158,22 @@ class QuestionarioTest(test.TestCase):
             usuario=self.usuarios[0],
             questao=questao_3,
             resposta='Resposta da questão 3',
+        )
+
+        models.QuestionariosQuestoes.objects.create(
+            questionario=questionario,
+            usuario=self.usuarios[0],
+            questao=questao_4,
+            item_questao=item_1,
+            alternativa_item_questao=item_1_alternativa_item_3
+        )
+
+        models.QuestionariosQuestoes.objects.create(
+            questionario=questionario,
+            usuario=self.usuarios[0],
+            questao=questao_4,
+            item_questao=item_2,
+            alternativa_item_questao=item_2_alternativa_item_4
         )
 
         models.UsuariosQuestionarios.objects.create(

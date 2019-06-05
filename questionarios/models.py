@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import models
 from model_utils.models import TimeStampedModel
-from rest_framework import exceptions
 
 
 class Questionario(TimeStampedModel):
@@ -75,9 +74,11 @@ class Questao(TimeStampedModel):
 
     questionario = models.ForeignKey(Questionario, related_name='questoes', on_delete=models.CASCADE)
 
-    tipo_questao = models.IntegerField(choices=tipo_questao_choices)
+    codigo = models.CharField(max_length=100)
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True)
+    requerida = models.BooleanField(default=True)
+    tipo_questao = models.IntegerField(choices=tipo_questao_choices)
 
     class Meta:
         """todo."""
@@ -110,12 +111,24 @@ class QuestionariosQuestoes(TimeStampedModel):
         'AlternativaQuestao',
         related_name='questionarios_questoes_alternativa_selecionada',
         on_delete=models.CASCADE,
-        null=True
+        null=True,
     )
     alternativas_selecionadas = models.ManyToManyField(
         'AlternativaQuestao',
         related_name='questionarios_questoes_alternativas_selecionadas',
-        blank=True
+        blank=True,
+    )
+    item_questao = models.ForeignKey(
+        'ItemQuestao',
+        related_name='questionarios_questoes_item_questao',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    alternativa_item_questao = models.ForeignKey(
+        'AlternativaItemQuestao',
+        related_name='questionarios_questoes_alternativa_item_questao',
+        on_delete=models.CASCADE,
+        null=True,
     )
 
     class Meta:
@@ -126,6 +139,10 @@ class QuestionariosQuestoes(TimeStampedModel):
     def alternativas_selecionadas_texto(self):
         """Retorna uma representação textual das alternativas selecionadas."""
         return ', '.join(map(str, self.alternativas_selecionadas.all()))
+
+    def alternativas_item_selecionados_texto(self):
+        """Retorna uma representação textal dos items."""
+        return f'[Item: {self.item_questao.titulo}][Alternativa: {self.alternativa_item_questao.titulo}]'
 
     def __str__(self):
         """toString."""
@@ -140,51 +157,69 @@ class QuestionariosQuestoes(TimeStampedModel):
         elif self.questao.tipo_questao == Questao.MULTIPLA_ESCOLHA:
             resposta += f'Alternativas: {self.alternativas_selecionadas_texto()}'
 
+        elif self.questao.tipo_questao == Questao.AVALIACAO:
+            resposta += self.alternativas_item_selecionados_texto()
+
         return resposta
 
 
 class AlternativaQuestao(TimeStampedModel):
     """Alternativa questão."""
 
-    TEXTO_LIVRE = 1
-    UNICA_ESCOLHA = 2
-    MULTIPLA_ESCOLHA = 3
+    UNICA_ESCOLHA = 1
+    TEXTO_LIVRE = 2
 
     tipo_alternativa_choices = [
-        (TEXTO_LIVRE, 'Texto'),
         (UNICA_ESCOLHA, 'Única Escolha'),
-        (MULTIPLA_ESCOLHA, 'Múltipla Escolha')
+        (TEXTO_LIVRE, 'Texto'),
     ]
 
     questao = models.ForeignKey(Questao, related_name='alternativas', on_delete=models.CASCADE, null=True)
-    alternativa = models.ForeignKey('self', related_name='alternativas',  on_delete=models.CASCADE, null=True)
 
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True)
     tipo_alternativa = models.IntegerField(choices=tipo_alternativa_choices, default=UNICA_ESCOLHA)
 
     resposta = models.TextField(blank=True)
-    alternativa_selecionada = models.ForeignKey(
-        'AlternativaQuestao',
-        related_name='alternativa_questao_alternativa_selecionada',
-        on_delete=models.CASCADE,
-        null=True
-    )
-    alternativas_selecionadas = models.ManyToManyField(
-        'AlternativaQuestao',
-        related_name='alternativa_questao_alternativas_selecionadas',
-        blank=True
-    )
 
     class Meta:
         """todo."""
 
         ordering = ['id']
 
-    def clean(self):
-        """Validação do modelo."""
-        if self.questao is None and self.alternativa is None:
-            raise exceptions.ValidationError('Questão, ou Alternativa, precisam ser definidos')
+    def __str__(self):
+        """toString."""
+        return self.titulo
+
+
+class ItemQuestao(TimeStampedModel):
+    """Item para questões do tipo avaliação."""
+
+    questao = models.ForeignKey(Questao, related_name='items_questao', on_delete=models.CASCADE)
+
+    titulo = models.TextField()
+
+    def __str__(self):
+        """toString."""
+        return f'Item referente a questão {self.questao.titulo}'
+
+
+class AlternativaItemQuestao(TimeStampedModel):
+    """Uma alternativa para item que questão do tipo avaliação."""
+
+    UNICA_ESCOLHA = 1
+
+    tipo_alternativa_item_questao_choices = [
+        (UNICA_ESCOLHA, 'Única Escolha'),
+    ]
+
+    item_questao = models.ForeignKey(ItemQuestao, related_name='alternativas', on_delete=models.CASCADE)
+
+    titulo = models.CharField(max_length=100)
+    tipo_alternativa = models.IntegerField(
+        choices=tipo_alternativa_item_questao_choices,
+        default=UNICA_ESCOLHA,
+    )
 
     def __str__(self):
         """toString."""
