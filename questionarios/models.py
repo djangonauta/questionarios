@@ -131,11 +131,6 @@ class QuestionariosQuestoes(TimeStampedModel):
         null=True,
     )
 
-    class Meta:
-        """todo."""
-
-        unique_together = ['questionario', 'questao', 'usuario']
-
     def alternativas_selecionadas_texto(self):
         """Retorna uma representação textual das alternativas selecionadas."""
         return ', '.join(map(str, self.alternativas_selecionadas.all()))
